@@ -365,32 +365,78 @@ function group(array, keySelector, valueSelector) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  result: '',
+
+  element(value) {
+    this.checkOrder(1);
+    const obj = Object.create(this);
+    obj.order = 1;
+    obj.result += `${value}`;
+    return obj;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.checkOrder(2);
+    const obj = Object.create(this);
+    obj.order = 2;
+    obj.result += `#${value}`;
+    return obj;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.checkOrder(3);
+    const obj = Object.create(this);
+    obj.order = 3;
+    obj.result += `.${value}`;
+    return obj;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.checkOrder(4);
+    const obj = Object.create(this);
+    obj.order = 4;
+    obj.result += `[${value}]`;
+    return obj;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.checkOrder(5);
+    const obj = Object.create(this);
+    obj.order = 5;
+    obj.result += `:${value}`;
+    return obj;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.checkOrder(6);
+    const obj = Object.create(this);
+    obj.order = 6;
+    obj.result += `::${value}`;
+    return obj;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const obj = Object.create(this);
+    obj.result = `${selector1.result} ${combinator} ${selector2.result}`;
+    return obj;
+  },
+
+  checkOrder(num) {
+    if (this.order === num && [1, 2, 6].includes(num)) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    }
+
+    if (this.order > num) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+  },
+
+  stringify() {
+    return this.result;
   },
 };
 
